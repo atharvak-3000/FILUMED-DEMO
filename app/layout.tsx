@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { Bebas_Neue, Barlow_Condensed, Space_Mono } from 'next/font/google';
 import '../styles/globals.css';
 import Navbar from '@/components/Navbar';
@@ -44,7 +45,9 @@ export default function RootLayout({
         <Navbar />
         <PageTransition>
           <main className="min-h-screen">
-            {children}
+            <Suspense fallback={<div style={{ background: '#0a0a0a', minHeight: '100vh' }} />}>
+              {children}
+            </Suspense>
           </main>
         </PageTransition>
         <SiteFooter />
