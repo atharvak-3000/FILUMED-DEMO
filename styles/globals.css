@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --red: #E8000D;
+  --red-dim: #a50009;
+  --white: #f5f5f5;
+  --black: #0a0a0a;
+  --gray: #1a1a1a;
+  --gray2: #2a2a2a;
+}
+
+body {
+  background: var(--black);
+  color: var(--white);
+  cursor: none;
+  overflow-x: hidden;
+}
+
+/* Hide default cursor on interactive items too */
+a, button, [role="button"], input, select, textarea, [data-hover] {
+  cursor: none !important;
+}
+
+/* Base custom classes */
+.bg-grid-lines {
+  background-image: 
+    linear-gradient(to right, rgba(232, 0, 13, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(232, 0, 13, 0.04) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.bg-scan-lines {
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(10, 10, 10, 0.9),
+    rgba(10, 10, 10, 0.9) 2px,
+    rgba(26, 26, 26, 0.4) 2px,
+    rgba(26, 26, 26, 0.4) 4px
+  );
+}
+
+.bg-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Marquee infinite scroll */
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 18s linear infinite;
+}
+
+/* Custom transition for button white sweep */
+.btn-sweep {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  transition: color 0.4s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.btn-sweep::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: var(--white);
+  z-index: -1;
+  transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.btn-sweep:hover::before {
+  transform: translateX(100%);
+}
+
+.btn-sweep:hover {
+  color: var(--black);
+}
+
+/* Custom transition for button red sweep */
+.btn-sweep-red {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  transition: border-color 0.4s cubic-bezier(0.76, 0, 0.24, 1), color 0.4s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.btn-sweep-red::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: var(--red);
+  z-index: -1;
+  transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.btn-sweep-red:hover::before {
+  transform: translateX(100%);
+}
+
+.btn-sweep-red:hover {
+  border-color: var(--red) !important;
+}
+
+/* Hide scrollbars utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+}
+.no-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+/* Custom scrollbar for Gen-Z clean design */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--black);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--gray2);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--red);
+}

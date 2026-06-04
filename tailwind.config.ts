@@ -9,8 +9,17 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        red: 'var(--red)',
+        'red-dim': 'var(--red-dim)',
+        black: 'var(--black)',
+        white: 'var(--white)',
+        gray: 'var(--gray)',
+        gray2: 'var(--gray2)',
+      },
+      fontFamily: {
+        display: ['var(--font-bebas-neue)', 'sans-serif'],
+        body: ['var(--font-barlow-condensed)', 'sans-serif'],
+        mono: ['var(--font-space-mono)', 'monospace'],
       },
     },
   },
