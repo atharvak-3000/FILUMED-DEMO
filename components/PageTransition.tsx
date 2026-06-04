@@ -1,17 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 
 const curtainVariants = {
   initial: {
-    scaleY: 0,
-    originY: '0%',
+    y: '-100%',
   },
   animate: {
-    scaleY: [0, 1, 1, 0],
-    originY: ['0%', '0%', '100%', '100%'],
+    y: ['-100%', '0%', '0%', '100%'],
     transition: {
       duration: 0.8,
       times: [0, 0.4, 0.6, 1],
@@ -22,46 +20,55 @@ const curtainVariants = {
 
 export default function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [opacity, setOpacity] = useState(1);
+  
+  // Cache the children so that we can freeze rendering of the old page
+  // during the first half of the transition animation.
+  const [displayChildren, setDisplayChildren] = useState(children);
+  const [curtainKey, setCurtainKey] = useState(0);
+  const prevPathname = useRef(pathname);
 
   useEffect(() => {
-    // Instantly hide the page content when navigating
-    setOpacity(0);
-    
-    // Fade it back in after the curtain covers the screen (0.4s delay)
-    const timer = setTimeout(() => {
-      setOpacity(1);
-    }, 400);
+    if (pathname !== prevPathname.current) {
+      // 1. Pathname changed - trigger the curtain animation key
+      setCurtainKey(prev => prev + 1);
 
-    return () => clearTimeout(timer);
-  }, [pathname]);
+      // 2. Freeze the displayChildren as the old page.
+      // At t = 400ms (when the curtain fully covers the screen),
+      // swap displayChildren to the new page content.
+      const timer = setTimeout(() => {
+        setDisplayChildren(children);
+      }, 400);
+
+      prevPathname.current = pathname;
+      return () => clearTimeout(timer);
+    } else {
+      // Keep displayChildren in sync with children for hot reloading / other updates
+      setDisplayChildren(children);
+    }
+  }, [pathname, children]);
 
   return (
     <>
       {/* Red curtain overlay — animates on every route change */}
-      <motion.div
-        key={pathname + '-curtain'}
-        variants={curtainVariants}
-        initial="initial"
-        animate="animate"
-        style={{
-          position: 'fixed',
-          inset: 0,
-          background: '#E8000D',
-          zIndex: 9999,
-          pointerEvents: 'none',
-          transformOrigin: 'top',
-        }}
-      />
+      {curtainKey > 0 && (
+        <motion.div
+          key={curtainKey}
+          variants={curtainVariants}
+          initial="initial"
+          animate="animate"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: '#E8000D',
+            zIndex: 9999,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
 
       {/* Page content wrapper with stable key to prevent Next.js App Router unmounting bugs */}
-      <div
-        style={{
-          opacity: opacity,
-          transition: 'opacity 0.4s cubic-bezier(0.215, 0.61, 0.355, 1)',
-        }}
-      >
-        {children}
+      <div>
+        {displayChildren}
       </div>
     </>
   );
