@@ -1,6 +1,7 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 
 const curtainVariants = {
@@ -19,53 +20,49 @@ const curtainVariants = {
   },
 };
 
-const pageVariants = {
-  initial: { opacity: 0 },
-  animate: {
-    opacity: 1,
-    transition: { duration: 0.4, delay: 0.5, ease: 'easeOut' as const },
-  },
-  exit: {
-    opacity: 0,
-    transition: { duration: 0.2, ease: 'easeIn' as const },
-  },
-};
-
 export default function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const [opacity, setOpacity] = useState(1);
+
+  useEffect(() => {
+    // Instantly hide the page content when navigating
+    setOpacity(0);
+    
+    // Fade it back in after the curtain covers the screen (0.4s delay)
+    const timer = setTimeout(() => {
+      setOpacity(1);
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [pathname]);
 
   return (
     <>
       {/* Red curtain overlay — animates on every route change */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={pathname + '-curtain'}
-          variants={curtainVariants}
-          initial="initial"
-          animate="animate"
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: '#E8000D',
-            zIndex: 9999,
-            pointerEvents: 'none',
-            transformOrigin: 'top',
-          }}
-        />
-      </AnimatePresence>
+      <motion.div
+        key={pathname + '-curtain'}
+        variants={curtainVariants}
+        initial="initial"
+        animate="animate"
+        style={{
+          position: 'fixed',
+          inset: 0,
+          background: '#E8000D',
+          zIndex: 9999,
+          pointerEvents: 'none',
+          transformOrigin: 'top',
+        }}
+      />
 
-      {/* Page content fades in after curtain drops */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={pathname}
-          variants={pageVariants}
-          initial="initial"
-          animate="animate"
-          exit="exit"
-        >
-          {children}
-        </motion.div>
-      </AnimatePresence>
+      {/* Page content wrapper with stable key to prevent Next.js App Router unmounting bugs */}
+      <div
+        style={{
+          opacity: opacity,
+          transition: 'opacity 0.4s cubic-bezier(0.215, 0.61, 0.355, 1)',
+        }}
+      >
+        {children}
+      </div>
     </>
   );
 }
