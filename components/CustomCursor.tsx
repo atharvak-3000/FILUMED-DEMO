@@ -108,6 +108,10 @@ export default function CustomCursor() {
     };
   }, [hovered, visible]);
 
+  if (typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches) {
+    return null;
+  }
+
   // If not visible, keep invisible
   return (
     <>
